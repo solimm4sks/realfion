@@ -253,7 +253,8 @@ def main():
     # parser.print_help()
     (options, args) = parser.parse_args()
     if not options.url:
-        options.url = 'http://www.thecrownofficial.com/index.php?page='
+        print('No URl specified. Exiting..')
+        exit()
     realfion = Realfion(options)
 
     if options.encodeMethod != None:
