@@ -253,7 +253,7 @@ def main():
     # parser.print_help()
     (options, args) = parser.parse_args()
     if not options.url:
-        print('No URl specified. Exiting..')
+        print('No URL specified. Exiting..')
         exit()
     realfion = Realfion(options)
 
