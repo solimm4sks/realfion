@@ -1,0 +1,86 @@
+/WINDOWS/php.ini
+/WINDOWS/system32/logfiles/MSFTPSVC
+/WINDOWS/system32/logfiles/MSFTPSVC1
+/WINDOWS/system32/logfiles/MSFTPSVC2
+/WINNT/system32/logfiles/MSFTPSVC
+/WINNT/system32/logfiles/MSFTPSVC1
+/WINNT/system32/logfiles/MSFTPSVC2
+/WINNT/system32/logfiles/SMTPSVC
+/WINNT/system32/logfiles/SMTPSVC1
+/WINNT/system32/logfiles/SMTPSVC2
+/WINNT/system32/logfiles/SMTPSVC3
+/WINNT/system32/logfiles/SMTPSVC4
+/WINNT/system32/logfiles/SMTPSVC5
+/WINDOWS/system32/logfiles/SMTPSVC
+/WINDOWS/system32/logfiles/SMTPSVC1
+/WINDOWS/system32/logfiles/SMTPSVC2
+/WINDOWS/system32/logfiles/SMTPSVC3
+/WINDOWS/system32/logfiles/SMTPSVC4
+/WINDOWS/system32/logfiles/SMTPSVC5
+/WINNT/system32/logfiles/W3SVC/inetsvn1.log
+/WINNT/system32/logfiles/W3SVC1/inetsvn1.log
+/WINNT/system32/logfiles/W3SVC2/inetsvn1.log
+/WINNT/system32/logfiles/W3SVC3/inetsvn1.log
+/WINDOWS/system32/logfiles/W3SVC/inetsvn1.log
+/WINDOWS/system32/logfiles/W3SVC1/inetsvn1.log
+/WINDOWS/system32/logfiles/W3SVC2/inetsvn1.log
+/WINDOWS/system32/logfiles/W3SVC3/inetsvn1.log
+/WINNT/php.ini
+/Program Files/Vidalia Bundle/Polipo/polipo.conf
+/Program Files/MySQL/MySQL Server 5.0/data/mysql.log
+/Program Files/MySQL/MySQL Server 5.0/data/mysql.err
+/Program Files/MySQL/MySQL Server 5.0/data/mysql-bin.log
+/Program Files/MySQL/MySQL Server 5.0/data/mysql-bin.index
+/Program Files/MySQL/data/mysql.log
+/Program Files/MySQL/data/mysql.err
+/Program Files/MySQL/data/mysql-bin.log
+/Program Files/MySQL/data/mysql-bin.index
+/Program Files/Apache Group/Apache/conf/httpd.conf
+/Program Files/Apache Group/Apache2/conf/httpd.conf
+/Program Files/xampp/apache/conf/apache.conf
+/Program Files/xampp/apache/conf/apache2.conf
+/Program Files/xampp/apache/conf/httpd.conf
+/Program Files/Apache Group/Apache/apache.conf
+/Program Files/Apache Group/Apache/conf/apache.conf
+/Program Files/Apache Group/Apache2/conf/apache.conf
+/Program Files/Apache Group/Apache/apache2.conf
+/Program Files/Apache Group/Apache/conf/apache2.conf
+/Program Files/Apache Group/Apache2/conf/apache2.conf
+/Program Files/Apache Software Foundation/Apache2.2/conf/httpd.conf
+/Program Files/[JBOSS]/server/default/conf/jboss-minimal.xml
+/Program Files/[JBOSS]/server/default/conf/jboss-service.xml
+/Program Files/[JBOSS]/server/default/conf/jndi.properties
+/Program Files/[JBOSS]/server/default/conf/log4j.xml
+/Program Files/[JBOSS]/server/default/conf/login-config.xml
+/Program Files/[JBOSS]/server/default/conf/standardjaws.xml
+/Program Files/[JBOSS]/server/default/conf/standardjboss.xml
+/Program Files/[JBOSS]/server/default/conf/server.log.properties
+/Program Files/[JBOSS]/server/default/deploy/jboss-logging.xml
+/Program Files/[JBOSS]/server/default/log/server.log
+/Program Files/[JBOSS]/server/default/log/boot.log
+/Program Files/MySQL/MySQL Server 5.0/my.ini
+/Program Files/MySQL/MySQL Server 5.0/my.cnf
+/Program Files/MySQL/my.ini
+/Program Files/MySQL/my.cnf
+/Program Files/PostgreSQL/8.3/data/pg_hba.conf
+/Program Files/PostgreSQL/8.3/data/pg_ident.conf
+/Program Files/PostgreSQL/8.3/data/postgresql.conf
+/Program Files/PostgreSQL/8.4/data/pg_hba.conf
+/Program Files/PostgreSQL/8.4/data/pg_ident.conf
+/Program Files/PostgreSQL/8.4/data/postgresql.conf
+/Program Files/PostgreSQL/9.0/data/pg_hba.conf
+/Program Files/PostgreSQL/9.0/data/pg_ident.conf
+/Program Files/PostgreSQL/9.0/data/postgresql.conf
+/Program Files/PostgreSQL/9.1/data/pg_hba.conf
+/Program Files/PostgreSQL/9.1/data/pg_ident.conf
+/Program Files/PostgreSQL/9.1/data/postgresql.conf
+/Program Files/Apache Group/Apache/logs/access.log
+/Program Files/Apache Group/Apache/logs/error.log
+/Program Files/Apache Software Foundation/Apache2.2/logs/error.log
+/Program Files/Apache Software Foundation/Apache2.2/logs/access.log
+/Library/WebServer/Documents/index.html
+/Library/WebServer/Documents/index.htm
+/Library/WebServer/Documents/default.html
+/Library/WebServer/Documents/default.htm
+/Library/WebServer/Documents/index.php
+/Library/WebServer/Documents/default.php
