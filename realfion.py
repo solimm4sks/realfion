@@ -199,7 +199,7 @@ class Realfion:
         if not ok:
             self.lfiWrappers()
 
-    def findLogs(self, method, logFile='./lfiFIles/'):
+    def findLogs(self, method, logFile='./lfiFiles/'):
         print(f'\n{bcolors.OKBLUE}Enumerating server..{bcolors.ENDC}')
         logFile += osLogFiles[self.os]
         fileList = open(logFile, 'r').read().split('\n')
