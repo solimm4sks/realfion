@@ -195,8 +195,6 @@ def generate(files, options):
 
 #endregion
 
-responseType = []
-
 def getTextLen(str):
     return len(str.encode('utf-8'))
 
@@ -213,21 +211,23 @@ def checkResponseType(url):
     r2len = getTextLen(r2.text)
     r3len = getTextLen(r3.text)
     # print(r1len, r2len, r3len)
+    responseType = []
     if r1.text == r2.text == r3.text:
-        responseType = ('nofeedback', r1len, r1.status_code)
+        responseType = ['nofeedback', r1len, r1.status_code]
         print(f'Detected no feedback from server, going in {bcolors.BOLD}blind{bcolors.ENDC}')
         print(f"Response size: {r1len}, {r2len}, {r3len}")
     else:
         if abs(r1len - r2len) > 100 or abs(r1len - r3len) > 100 or abs(r2len - r3len) > 100:
-            responseType = ('random', -1, r1.status_code)
+            responseType = ['random', -1, r1.status_code]
             print(f'{bcolors.FAIL}Server response seemingly random. Exiting..{bcolors.ENDC}')
             print(f"Response size: {r1len}, {r2len}, {r3len}")
         else:
-            responseType = ('feedback', max(r1len, r2len, r2len), r1.status_code)
+            responseType = ['feedback', max(r1len, r2len, r2len), r1.status_code]
             print(f'Detected some {bcolors.BOLD}feedback{bcolors.ENDC} from server.')
             print(f"Response size: {r1len}, {r2len}, {r3len}")
     print('\n')
-
+    return responseType
+    
 badText = [
     'was not found',
     'Warning: include',
@@ -235,7 +235,7 @@ badText = [
     'No such file or directory'
 ]
 
-def checkLFI(response):
+def checkLFI(response, responseType):
     if str(response.status_code)[0] != "2" and response.status_code == responseType[2]:
         return False
     if response.status_code == 403 or response.status_code == 404:
@@ -251,9 +251,9 @@ def checkLFI(response):
     else:
         print(f"Invalid ResponseType {responseType[0]} {responseType[1]} {responseType[2]}")
 
-def printIfLFI(payloadLine, response, writeToFile, file = None, printFail = False):
+def printIfLFI(payloadLine, response, responseType, writeToFile, file = None, printFail = False):
         tlen = getTextLen(response.text)
-        isLFI = checkLFI(response)
+        isLFI = checkLFI(response, responseType)
         if isLFI:
             out1 = f"Status: " + (f"{bcolors.OKGREEN}" if str(response.status_code)[0] == "2" else f"{bcolors.FAIL}") + f"{response.status_code}{bcolors.ENDC}"
             out1 += f"\tSize: {tlen}\t"
@@ -266,14 +266,14 @@ def printIfLFI(payloadLine, response, writeToFile, file = None, printFail = Fals
             print(f"{bcolors.FAIL}Status: {response.status_code}\tSize: {tlen}\tPayload: {payloadLine}{bcolors.ENDC}")
 
 def attack(url, payload, writeToFile = True, printFail = False):
+    responseType = checkResponseType(url)
     print(f'{bcolors.OKBLUE}Attacking the server..{bcolors.ENDC}')
-    checkResponseType(url)
-    
+    print(f"{bcolors.BOLD}[0/{len(payload) - 1}]{bcolors.ENDC}")
     resultsFile = open("out/attackResults.txt", "w+") if writeToFile else None
     for i in range(len(payload)):
         r = requests.get(url + payload[i])
         deleteLastLine()
-        printIfLFI(payload[i], r, writeToFile, resultsFile, printFail)
+        printIfLFI(payload[i], r, responseType, writeToFile, resultsFile, printFail)
         print(f"{bcolors.BOLD}[{i}/{len(payload) - 1}]{bcolors.ENDC}")
 
 
