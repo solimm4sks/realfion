@@ -5,6 +5,3 @@ realfion = {\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(re)mote + loc(al) = real,\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(f)ile inclus(ion) = fion\
 }
-
-Libraries used:\
-pathlib, base64, optparse, json, requests, sys
