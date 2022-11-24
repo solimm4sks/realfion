@@ -20,7 +20,6 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-
 #region Payload Generation
 
 def urlencodeAll(string):
@@ -196,7 +195,6 @@ def checkResponseType(url):
     r1len = getTextLen(r1.text)
     r2len = getTextLen(r2.text)
     r3len = getTextLen(r3.text)
-    # print(r1len, r2len, r3len)
     responseType = []
     if r1.text == r2.text == r3.text:
         responseType = ['nofeedback', r1len, r1.status_code]
@@ -286,10 +284,6 @@ def main():
     parser.add_option("-c", "--custom-files", dest="files", help="Apply LFI methods for all potential files in specified file. Value: 1 to use built-in list for specified OS.")
     parser.add_option('-p', '--payload-file', dest='payload', help="Specify the payload file to be used instead of generating one.")
     parser.add_option("-d", "--dont-attack", dest="dontAttack", action="store_true", default=False, help="Just make the payload file, don't send requests to the server.")
-    
-    # probs remove, too much of a hassle to implement parser.add_option('-l', '--logs', action='store_true', dest='findLogs', help='try to find logs (for potential RCE) with the method that LFI detection found (if found)')
-    parser.add_option('-w', '--wrappers', action='store_true', dest='onlyWrappers', help='only try php wrappers for the url')
-    
     (commandOptions, args) = parser.parse_args()
     
     payload = []
