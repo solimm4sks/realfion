@@ -246,10 +246,15 @@ def checkLFI(response):
             if x in response.text:
                 return False
         return True
-    else:
+    elif responseType[0] == "nofeedback":
+        print(getTextLen(response.text))
+        print(responseType[1])
+        
         return getTextLen(response.text) != responseType[1]
+    else:
+        print("Invalid ResponseType")
 
-def printIfLFI(payloadLine, response, writeToFile, file = None):
+def printIfLFI(payloadLine, response, writeToFile, file = None, printFail = False):
         tlen = getTextLen(response.text)
         isLFI = checkLFI(response)
         if isLFI:
@@ -260,10 +265,10 @@ def printIfLFI(payloadLine, response, writeToFile, file = None):
             out2 = f"Status: {response.status_code}\tSize: {tlen}\tPayload: {payloadLine}\n"
             if writeToFile:
                 file.write(out2)
-        else:
+        elif printFail:
             print(f"{bcolors.FAIL}Status: {response.status_code}\tSize: {tlen}\tPayload: {payloadLine}{bcolors.ENDC}")
 
-def attack(url, payload, writeToFile = True):
+def attack(url, payload, writeToFile = True, printFail = False):
     print(f'{bcolors.OKBLUE}Attacking the server..{bcolors.ENDC}')
     checkResponseType(url)
     
@@ -271,7 +276,7 @@ def attack(url, payload, writeToFile = True):
     for i in range(len(payload)):
         r = requests.get(url + payload[i])
         deleteLastLine()
-        printIfLFI(payload[i], r, writeToFile, resultsFile)
+        printIfLFI(payload[i], r, writeToFile, resultsFile, printFail)
         print(f"{bcolors.BOLD}[{i}/{len(payload) - 1}]{bcolors.ENDC}")
 
 
