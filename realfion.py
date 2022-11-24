@@ -216,14 +216,16 @@ def checkResponseType(url):
     if r1.text == r2.text == r3.text:
         responseType = ('nofeedback', r1len, r1.status_code)
         print(f'Detected no feedback from server, going in {bcolors.BOLD}blind{bcolors.ENDC}')
+        print(f"Response size: {r1len}, {r2len}, {r3len}")
     else:
         if abs(r1len - r2len) > 100 or abs(r1len - r3len) > 100 or abs(r2len - r3len) > 100:
             responseType = ('random', -1, r1.status_code)
             print(f'{bcolors.FAIL}Server response seemingly random. Exiting..{bcolors.ENDC}')
-            
+            print(f"Response size: {r1len}, {r2len}, {r3len}")
         else:
             responseType = ('feedback', max(r1len, r2len, r2len), r1.status_code)
             print(f'Detected some {bcolors.BOLD}feedback{bcolors.ENDC} from server.')
+            print(f"Response size: {r1len}, {r2len}, {r3len}")
     print('\n')
 
 badText = [
@@ -270,7 +272,7 @@ def attack(url, payload, writeToFile = True):
         r = requests.get(url + payload[i])
         deleteLastLine()
         printIfLFI(payload[i], r, writeToFile, resultsFile)
-        print(f"{bcolors.BOLD}[{i}/{len(payload)}]{bcolors.ENDC}")
+        print(f"{bcolors.BOLD}[{i}/{len(payload) - 1}]{bcolors.ENDC}")
 
 
 fileForOS = {
