@@ -1,0 +1,179 @@
+/WINNT/system32/logfiles/Firewall/pfirewall.log
+/Program Files/MySQL/MySQL Server 5.0/data/mysql.log
+/WINNT/system32/logfiles/SMTPSVC1
+/Program Files/[JBOSS]/server/default/conf/jboss-service.xml
+/Program Files/[JBOSS]/server/default/deploy/jboss-logging.xml
+/wamp/bin/apache/apache2.2.22/conf/httpd.conf
+/WINDOWS/system32/logfiles/W3SVC/inetsvn1.log
+/PostgreSQL/log/pgadmin.log
+/Program Files/PostgreSQL/8.4/data/pg_hba.conf
+/Program Files/[JBOSS]/server/default/conf/log4j.xml
+/WINNT/system32/logfiles/W3SVC/inetsvn1.log
+/Library/WebServer/Documents/default.php
+/Program Files/Apache Group/Apache2/conf/apache2.conf
+/Program Files/PostgreSQL/8.3/data/pg_hba.conf
+/xampp/apache/logs/access.log
+/WINNT/system32/logfiles/SMTPSVC3
+/usr/local/pgsql/data/postgresql.conf
+/mysql/bin/my.ini
+/xampp/htdocs/leer.txt
+/WINDOWS/system32/drivers/etc/hosts
+/MySQL/data/mysql.log
+/Library/WebServer/Documents/default.html
+/var/nm2/postgresql.conf
+/WINDOWS/comsetup.log
+/MySQL/my.ini
+/usr/local/pgsql/data/pg_hba.conf
+/Program Files/MySQL/data/mysql-bin.log
+/Program Files/Apache Group/Apache/conf/apache2.conf
+/wamp/bin/mysql/mysql5.5.24/my.ini
+/php/php.ini
+/xampp/mysql/data/mysql-bin.index
+/WINNT/php.ini
+/Program Files/Apache Group/Apache2/conf/apache.conf
+/WINDOWS/setupapi.log
+/xampp/php/php.ini
+/wamp/bin/mysql/mysql5.5.16/wampserver.conf
+/Library/WebServer/Documents/index.php
+/Program Files/Apache Software Foundation/Apache2.2/conf/httpd.conf
+/xampp/MercuryMail/mercury.ini
+/xampp/apache/conf/httpd.conf
+/Program Files/[JBOSS]/server/default/conf/standardjboss.xml
+/Program Files/[JBOSS]/server/default/conf/login-config.xml
+/MySQL/data/{IPDELHOST}.err
+/WINDOWS/system32/logfiles/MSFTPSVC2
+/WINDOWS/system32/logfiles/Firewall/pfirewall.log
+/WINNT/system32/logfiles/SMTPSVC
+/home/postgres/data/postgresql.conf
+/Program Files/PostgreSQL/9.0/data/pg_ident.conf
+/NetServer/bin/stable/apache/php.ini
+/Program Files/[JBOSS]/server/default/conf/standardjaws.xml
+/MySQL/data/mysql-bin.log
+/Program Files/MySQL/MySQL Server 5.0/my.ini
+/WINDOWS/system32/logfiles/MSFTPSVC1
+/xampp/webalizer/webalizer.conf
+/WINNT/system32/logfiles/SMTPSVC2
+/home/postgres/data/pg_hba.conf
+/Program Files/MySQL/data/mysql.err
+/xampp/FileZillaFTP/FileZilla Server.xml
+/MySQL/my.cnf
+/WINDOWS/WindowsUpdate.log
+/WINDOWS/system32/logfiles/SMTPSVC4
+/Library/WebServer/Documents/index.htm
+/Program Files/Apache Group/Apache/apache.conf
+/WINDOWS/setupact.log
+/xampp/sendmail/sendmail.ini
+/wamp/bin/apache/apache2.2.21/logs/error.log
+/wamp/logs/slowquery.log
+/Program Files/MySQL/data/{IPDELHOST}.err
+/Program Files/MySQL/MySQL Server 5.0/data/mysql-bin.index
+/Program Files/[JBOSS]/server/default/log/boot.log
+/wamp/logs/apache_error.log
+/Program Files/Apache Software Foundation/Apache2.2/logs/error.log
+/MySQL/data/mysql-bin.index
+/WINDOWS/system32/logfiles/W3SVC2/inetsvn1.log
+/wamp/bin/apache/apache2.2.22/conf/wampserver.conf
+/wamp/logs/access.log
+/wamp/bin/apache/apache2.2.22/logs/error.log
+/boot.ini
+/Program Files/Apache Group/Apache/logs/access.log
+/WINDOWS/wmsetup.log
+/WINDOWS/system32/logfiles/SMTPSVC
+/WINDOWS/system32/logfiles/W3SVC1/inetsvn1.log
+/Program Files/Vidalia Bundle/Polipo/polipo.conf
+/Program Files/Apache Group/Apache/apache2.conf
+/apache/php/php.ini
+/wamp/bin/mysql/mysql5.5.16/data/mysql-bin.index
+/wamp/bin/apache/apache2.2.21/conf/httpd.conf
+/WINDOWS/system32/drivers/etc/lmhosts.sam
+/WINNT/system32/logfiles/MSFTPSVC
+/xampp/mysql/data/mysql.err
+/home/postgres/data/pg_ident.conf
+/wamp/bin/apache/apache2.2.22/logs/access.log
+/WINDOWS/ODBC.INI
+/Program Files/PostgreSQL/8.4/data/pg_ident.conf
+/Program Files/MySQL/MySQL Server 5.0/data/{IPDELHOST}.err
+/Program Files/xampp/apache/conf/httpd.conf
+/Program Files/PostgreSQL/8.3/data/pg_ident.conf
+/WINNT/system32/logfiles/Firewall/pfirewall.log.old
+/xampp/mysql/data/{IPDELHOST}.err
+/WINNT/system32/logfiles/MSFTPSVC1
+/Program Files/PostgreSQL/8.4/data/postgresql.conf
+/WINDOWS/system32/logfiles/Firewall/pfirewall.log.old
+/WINDOWS/system32/Macromed/Flash/FlashInstall.log
+/WINNT/system32/logfiles/SMTPSVC5
+/WINDOWS/system32/logfiles/W3SVC3/inetsvn1.log
+/WINDOWS/system32/logfiles/MSFTPSVC
+/php4/php.ini
+/Program Files/[JBOSS]/server/default/conf/server.log.properties
+/xampp/sendmail/sendmail.log
+/WINDOWS/system32/drivers/etc/networks
+/etc/postgresql/pg_hba.conf
+/WINDOWS/system32/drivers/etc/protocol
+/Program Files/MySQL/my.ini
+/Program Files/PostgreSQL/9.1/data/pg_hba.conf
+/Program Files/xampp/apache/conf/apache.conf
+/WINDOWS/updspapi.log
+/Program Files/MySQL/data/mysql.log
+/usr/local/pgsql/bin/pg_passwd
+/Program Files/xampp/apache/conf/apache2.conf
+/Program Files/PostgreSQL/9.0/data/pg_hba.conf
+/WINNT/system32/logfiles/SMTPSVC4
+/WINDOWS/php.ini
+/MySQL/data/mysql.err
+/xampp/phpMyAdmin/config.inc.php
+/WINDOWS/system32/logfiles/SMTPSVC3
+/usr/internet/pgsql/data/pg_hba.conf
+/Program Files/[JBOSS]/server/default/conf/jndi.properties
+/xampp/apache/logs/error.log
+/xampp/htdocs/admin.php
+/etc/postgresql/postgresql.conf
+/WINNT/system32/logfiles/W3SVC3/inetsvn1.log
+/xampp/htdocs/aca.txt
+/usr/local/pgsql/data/passwd
+/WINDOWS/system32/logfiles/SMTPSVC2
+/Program Files/[JBOSS]/server/default/log/server.log
+/PHP/php.ini
+/wamp/bin/php/php5.3.8/php.ini
+/Program Files/Apache Group/Apache/conf/httpd.conf
+/Program Files/Apache Group/Apache2/conf/httpd.conf
+/wamp/logs/mysql.log
+/wamp/bin/mysql/mysql5.5.16/my.ini
+/Program Files/[JBOSS]/server/default/conf/jboss-minimal.xml
+/Program Files/Apache Group/Apache/conf/apache.conf
+/Program Files/PostgreSQL/8.3/data/postgresql.conf
+/var/postgresql/db/postgresql.conf
+/wamp/bin/apache/apache2.2.21/wampserver.conf
+/wamp/bin/php/php5.4.3/php.ini
+/wamp/bin/mysql/mysql5.5.24/data/mysql-bin.index
+/WINDOWS/repair/setup.log
+/xampp/apache/bin/php.ini
+/var/log/lighttpd/{DOMAIN}/access.log
+/WINDOWS/system32/drivers/etc/services
+/WINDOWS/Debug/NetSetup.LOG
+/home/postgres/data/PG_VERSION
+/WINDOWS/setuperr.log
+/Library/WebServer/Documents/default.htm
+/Program Files/PostgreSQL/9.0/data/postgresql.conf
+/php5/php.ini
+/wamp/bin/apache/apache2.2.22/wampserver.conf
+/wamp/logs/genquery.log
+/WINNT/system32/logfiles/W3SVC2/inetsvn1.log
+/Library/WebServer/Documents/index.html
+/Program Files/MySQL/MySQL Server 5.0/data/mysql-bin.log
+/Program Files/MySQL/my.cnf
+/Program Files/PostgreSQL/9.1/data/postgresql.conf
+/Program Files/Apache Software Foundation/Apache2.2/logs/access.log
+/WINDOWS/system32/logfiles/SMTPSVC5
+/Program Files/Apache Group/Apache/logs/error.log
+/WINDOWS/system32/Macromed/Flash/install.log
+/Program Files/MySQL/data/mysql-bin.index
+/wamp/bin/mysql/mysql5.5.24/wampserver.conf
+/WINDOWS/system32/logfiles/SMTPSVC1
+/Program Files/PostgreSQL/9.1/data/pg_ident.conf
+/var/lib/pgsql/data/postgresql.conf
+/Program Files/MySQL/MySQL Server 5.0/data/mysql.err
+/WINNT/system32/logfiles/W3SVC1/inetsvn1.log
+/WINNT/system32/logfiles/MSFTPSVC2
+/wamp/bin/apache/apache2.2.21/logs/access.log
+/Program Files/MySQL/MySQL Server 5.0/my.cnf
