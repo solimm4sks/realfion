@@ -195,7 +195,7 @@ def generate(files, options):
 
 #endregion
 
-responseType = ('', -2, 403)
+responseType = []
 
 def getTextLen(str):
     return len(str.encode('utf-8'))
@@ -247,12 +247,9 @@ def checkLFI(response):
                 return False
         return True
     elif responseType[0] == "nofeedback":
-        print(getTextLen(response.text))
-        print(responseType[1])
-        
         return getTextLen(response.text) != responseType[1]
     else:
-        print("Invalid ResponseType")
+        print(f"Invalid ResponseType {responseType[0]} {responseType[1]} {responseType[2]}")
 
 def printIfLFI(payloadLine, response, writeToFile, file = None, printFail = False):
         tlen = getTextLen(response.text)
